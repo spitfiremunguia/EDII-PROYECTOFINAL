@@ -6,3 +6,115 @@ body {
 a {
   color: #00B7FF;
 }
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+}
+
+li {
+  float: right;
+  border-right: 1px solid 	#F08080;
+}
+lii {
+  float: left;
+  border-right: 1px solid 	#F08080;
+}
+lii a
+{
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+/* Change the link color to #111 (black) on hover */
+li a:hover {
+  background-color: 	#FF69B4;
+}
+li:last-child {
+  border-right: none;
+}
+lii a:hover {
+  background-color: 	#FF69B4;
+}
+lii:last-child {
+  border-right: none;
+}
+body {
+  background-color:	#FFFF00  ;
+  background-image: url('/images/feather.png');
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center; 
+  
+}
+
+div.bigtitle
+{
+  font-size: 200px;
+  font-family: Impact, Charcoal, sans-serif;
+  color: rgb(7, 6, 6);
+  border-radius: 1em;
+  padding: 1em;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%) 
+}
+body.createBody
+{
+  background-color:	rgb(0, 195, 255)  ;
+  background-image: url('/images/feather.png');
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center; 
+}
+input.btn
+{
+  display: inline-block;
+  -webkit-font-smoothing: antialiased;
+  background-color: rgb(231, 97, 153); /* dark blue */
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 100;
+  text-decoration: none;
+  user-select: none;
+  letter-spacing: 1px;
+  color: white;
+  padding: 20px 40px;
+  text-transform: uppercase;
+  Transition: background-color 0.1s ease-out;
+  -webkit-filter: url("#filter");
+  filter: url("#filter");
+}
+input.btn:hover {
+  background-color: rgb(231, 255, 14); /* green */
+}
+img.def
+{
+  border-radius: 50%;
+  display: block;
+  position: relative;;
+  height: 200px;
+  width: 150px;
+  left: 50%;
+  margin-right: -50%;
+  border-style: dotted;
+
+  
+}
+
+  

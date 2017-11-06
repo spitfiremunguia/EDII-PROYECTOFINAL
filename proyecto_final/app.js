@@ -25,7 +25,9 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use('/public',express.static(path.join(__dirname, '/public')));
+app.use('/images',express.static(path.join(__dirname, '/public/images')));
+//app.use('/styles',express.static(__dirname + "/styles"));
 
 app.use('/', index);
 app.use('/users', users);
@@ -34,6 +36,37 @@ app.listen(8000,function()
 {
   console.log('Server is up');
 });
+//Llamar a la función de crear usuarios
+app.get('/create',function(req,res)
+{
+  console.log("Creando usuario...");
+  res.render(__dirname+'/views/create.ejs');
+});
+//verificar y crear al usuario
+app.post('/createUser',function(req, res)
+{
+  var Nombre=req.body.nombre;
+  var Apellido=req.body.appellido;
+  var Usuario=req.body.usuario;
+  var Correo=req.body.correo;
+  var Contraseña=req.body.contraseña;//Encriptarla
+  var imgPath=req.body.fileInput;
+  var nuevoUsuario={
+    nombre:Nombre,
+    apellido:Apellido,
+    usuario:Usuario,
+    correo:Correo,
+    contraseña:Contraseña,
+    imagenpath:imgPath,
+    amigos:[]
+    
+  };
+  //Guardar al usuario
+ console.log(nuevoUsuario);
+});
+
+
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
