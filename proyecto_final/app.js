@@ -10,6 +10,11 @@ var Usuario=require('./routes/Usuario')
 var index = require('./routes/index');
 var users = require('./routes/users');
 var multer=require('multer');
+
+
+var onlineUsers = {};
+var sockets = {};
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, './public/uploads/')
@@ -34,6 +39,9 @@ var db = mongoose.connect(db, function(err){
 
 
 var app = express();
+var server = require('http').createServer(app);
+var io = require('socket.io').listen(server);
+var q = 0;
 
 // view engine setup
 app.engine('html', cons.swig)
@@ -53,7 +61,7 @@ app.use('/images', express.static(path.join(__dirname, '/public/images')));
 app.use('/', index);
 app.use('/users', users);
 //Listen
-app.listen(3000, function () {
+server.listen(8000, function () {
   console.log('Server is up');
 });
 //Llamar a la función de crear usuarios
@@ -68,15 +76,20 @@ app.post('/createUser',  upload.single('Imagen'),  function (req, res) {
   console.log(req.file);
   req.body.Imagen=(req.file==undefined)?'/images/noUser.jpg':req.file.path;//Aqui se pueden comprimir supongo
   req.body.Contraseña=md5(req.body.Contraseña);//La contraseña se va a guardar en md5 en el servidor
-  Usuario.create(req.body,function(err)
-  {
-    if(err){res.send(err);}
-    else{
-      console.log('Usuario añadido exitosamente');
-      res.status(201).redirect('/');
+  Usuario.count({Username: req.body.Username}, function(err, c){
+    if(c == 0){
+      Usuario.create(req.body,function(err)
+      {
+        if(err){res.send(err);}
+        else{
+          console.log('Usuario añadido exitosamente');
+          res.status(201).redirect('/');
+        }
+      });
+    }else{
+      console.log("Usuario ya existe");
     }
-  });
-
+  }); 
 });
 //Login petition 
 app.get('/Login',function(req,res)
@@ -123,6 +136,45 @@ app.post('/Login',function(req,res,next)
   });
   //Buscar en la base de datos
 
+});
+app.use(express.static(__dirname+ '/public'));
+io.sockets.on('connection', function(socket){
+  console.log("User connected");
+  socket.nickname = "usuario " + (q++);
+  sockets[socket.id] = socket;
+
+  socket.on('send-message', function(data, callback){
+    console.log("sending a message...");
+    io.emit('new-message', {
+      nick: socket.nickname,
+      msg: data,
+      side: "left"
+    });
+  });
+  function updateNickNames(){
+    io.sockets.emit("usernames", Object.keys(users));
+  }
+  socket.on('new-user', function(data, callback){
+    if(data in users){
+      callback(false);
+    }else{
+      callback(true);
+      socket.nickname = data;
+      users[socket.nickname] = socket;
+      updateNickNames();
+    }
+  });
+
+  socket.on('disconnect', function(data){
+    console.log("Disconnected");
+    if(!socket.nickname) return;
+    delete users[socket.nickname];
+    updateNickNames();
+  });
+});
+
+app.get('/Chat', function(req, res){
+  res.render('chat.ejs');
 });
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
