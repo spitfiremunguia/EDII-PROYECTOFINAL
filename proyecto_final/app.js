@@ -6,11 +6,12 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var cons = require('consolidate');
 var mongoose = require('mongoose');
-var Usuario=require('./routes/Usuario')
+var Usuario = require('./routes/Usuario')
 var index = require('./routes/index');
 var users = require('./routes/users');
-var multer=require('multer');
-
+var multer = require('multer');
+var localStorate = require('localStorage');
+var moment = require('moment')
 
 var onlineUsers = {};
 var sockets = {};
@@ -23,18 +24,50 @@ const storage = multer.diskStorage({
     cb(null, file.originalname)
   }
 })
-var upload=multer({storage:storage});
-var md5=require('md5')
+var upload = multer({ storage: storage });
+var md5 = require('md5')
 
 
 //Conexión a mongo
 var db = "mongodb://localhost:27017/proyectoFinal/Users";//Por el momento esta local
-var db = mongoose.connect(db, function(err){
-	if(err){
-		console.log("Ocurrió un error al intentar conectar a la base de datos.");
-		console.log("Intente montar la base de datos de manera local.");
-	}
+var db = mongoose.connect(db, function (err) {
+  if (err) {
+    console.log("Ocurrió un error al intentar conectar a la base de datos.");
+    console.log("Intente montar la base de datos de manera local.");
+  }
 });
+function crearToken(usuario) {
+  console.log(usuario);
+  const payload =
+    {
+      Username: usuario.Username,
+      Contraseña: usuario.Contraseña,
+      Ini: moment().unix(),
+      Exp: moment().add(2, 'minutes').unix()
+    }
+  var token = jwt.encode(payload, 'ESTRUCTURAS');
+  console.log(token);
+  localStorage.setItem('jwt', JSON.stringify(token));
+  return;
+}
+
+function validar(token) {
+  var validacion = jwt.decode(token, 'ESTRUCTURAS');
+  console.log(validacion);
+  var date = moment().unix();
+  if (date > validacion.Exp) {
+    return true;
+  }
+  return false;
+
+}
+
+
+
+
+
+
+
 
 
 
@@ -71,58 +104,64 @@ app.get('/create', function (req, res) {
   res.render(__dirname + '/views/create.ejs');
 });
 //verificar y crear al usuario
-app.post('/createUser',  upload.single('Imagen'),  function (req, res) {
- 
+app.post('/createUser', upload.single('Imagen'), function (req, res) {
+
   console.log(req.file);
-  req.body.Imagen=(req.file==undefined)?'/images/noUser.jpg':req.file.path;//Aqui se pueden comprimir supongo
-  req.body.Contraseña=md5(req.body.Contraseña);//La contraseña se va a guardar en md5 en el servidor
-  Usuario.count({Username: req.body.Username}, function(err, c){
-    if(c == 0){
-      Usuario.create(req.body,function(err)
-      {
-        if(err){res.send(err);}
-        else{
+  req.body.Imagen = (req.file == undefined) ? '/images/noUser.jpg' : req.file.path;//Aqui se pueden comprimir supongo
+  req.body.Contraseña = md5(req.body.Contraseña);//La contraseña se va a guardar en md5 en el servidor
+  Usuario.count({ Username: req.body.Username }, function (err, c) {
+    if (c == 0) {
+      Usuario.create(req.body, function (err) {
+        if (err) { res.send(err); }
+        else {
           console.log('Usuario añadido exitosamente');
+          Usuario.findOne({ Username: req.body.Username, Contraseña: req.body.Contraseña }).exec(function (err, usuario) {
+            if(err)
+            {
+              res.status(500);
+              console.log('Ha ocurrido un error')
+            }
+            else
+            {
+              crearToken(usuario);//Aqui es donde se crea el jwt
+            }
+
+          });
           res.status(201).redirect('/');
         }
       });
-    }else{
+    } else {
       console.log("Usuario ya existe");
     }
-  }); 
+  });
 });
 //Login petition 
-app.get('/Login',function(req,res)
-{
+app.get('/Login', function (req, res) {
   console.log('Entrando al Login');
   res.status(200).render(__dirname + '/views/Login.ejs');
 });
 //Login request
-app.post('/Login',function(req,res,next)
-{
-  var UserCorreo=req.body.Usuario;
-  var contraseña=md5(req.body.Contraseña);
-  Usuario.findOne({Username:UserCorreo,Contraseña:contraseña}).exec(function(err,usuario){
-    if(err)
-    {
+app.post('/Login', function (req, res, next) {
+  var UserCorreo = req.body.Usuario;
+  var contraseña = md5(req.body.Contraseña);
+  Usuario.findOne({ Username: UserCorreo, Contraseña: contraseña }).exec(function (err, usuario) {
+    if (err) {
 
       next(err);
       console.log('Not found');
       res.status(404);
     }
-    else{
-      console.log('---Obteniendo al usuario: '+usuario.Username)
+    else {
+      console.log('---Obteniendo al usuario: ' + usuario.Username)
       console.log(usuario);
-      Usuario.find({}).exec(function(err, usuarios){
-        if(err)
-        {
+      Usuario.find({}).exec(function (err, usuarios) {
+        if (err) {
           console.log('Ha ocurrido un error');
-        
+
         }
-        else
-        {
+        else {
           console.log(usuarios);
-          res.status(200).render(__dirname + '/views/Chat.ejs',{user:usuario,data:usuarios});
+          res.status(200).render(__dirname + '/views/Chat.ejs', { user: usuario, data: usuarios });
         }
       });
 
@@ -131,19 +170,19 @@ app.post('/Login',function(req,res,next)
 
 
 
-      
+
     }
   });
   //Buscar en la base de datos
 
 });
-app.use(express.static(__dirname+ '/public'));
-io.sockets.on('connection', function(socket){
+app.use(express.static(__dirname + '/public'));
+io.sockets.on('connection', function (socket) {
   console.log("User connected");
   socket.nickname = "usuario " + (q++);
   sockets[socket.id] = socket;
 
-  socket.on('send-message', function(data, callback){
+  socket.on('send-message', function (data, callback) {
     console.log("sending a message...");
     io.emit('new-message', {
       nick: socket.nickname,
@@ -151,13 +190,13 @@ io.sockets.on('connection', function(socket){
       side: "left"
     });
   });
-  function updateNickNames(){
+  function updateNickNames() {
     io.sockets.emit("usernames", Object.keys(users));
   }
-  socket.on('new-user', function(data, callback){
-    if(data in users){
+  socket.on('new-user', function (data, callback) {
+    if (data in users) {
       callback(false);
-    }else{
+    } else {
       callback(true);
       socket.nickname = data;
       users[socket.nickname] = socket;
@@ -165,15 +204,15 @@ io.sockets.on('connection', function(socket){
     }
   });
 
-  socket.on('disconnect', function(data){
+  socket.on('disconnect', function (data) {
     console.log("Disconnected");
-    if(!socket.nickname) return;
+    if (!socket.nickname) return;
     delete users[socket.nickname];
     updateNickNames();
   });
 });
 
-app.get('/Chat', function(req, res){
+app.get('/Chat', function (req, res) {
   res.render('chat.ejs');
 });
 // catch 404 and forward to error handler
