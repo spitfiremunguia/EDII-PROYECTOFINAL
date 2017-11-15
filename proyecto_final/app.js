@@ -1,3 +1,4 @@
+//import { Client } from '_debugger';
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -10,8 +11,9 @@ var Usuario = require('./routes/Usuario')
 var index = require('./routes/index');
 var users = require('./routes/users');
 var multer = require('multer');
-var localStorate = require('localStorage');
-var moment = require('moment')
+var localStorage = require('localStorage');
+var moment = require('moment');
+var jwt=require('jwt-simple');
 
 var onlineUsers = {};
 var sockets = {};
@@ -36,6 +38,7 @@ var db = mongoose.connect(db, function (err) {
     console.log("Intente montar la base de datos de manera local.");
   }
 });
+var jwt_decode=require('jwt-decode');
 function crearToken(usuario) {
   console.log(usuario);
   const payload =
@@ -43,7 +46,7 @@ function crearToken(usuario) {
       Username: usuario.Username,
       Contraseña: usuario.Contraseña,
       Ini: moment().unix(),
-      Exp: moment().add(2, 'minutes').unix()
+      Exp: moment().add(1,'m').unix()
     }
   var token = jwt.encode(payload, 'ESTRUCTURAS');
   console.log(token);
@@ -52,13 +55,16 @@ function crearToken(usuario) {
 }
 
 function validar(token) {
-  var validacion = jwt.decode(token, 'ESTRUCTURAS');
-  console.log(validacion);
+  var validacion = JSON.stringify(jwt_decode(token));
+  console.log('El token decodificado  es: '+validacion);
   var date = moment().unix();
-  if (date > validacion.Exp) {
-    return true;
+  var tokenDate=JSON.parse(validacion).Exp;
+  console.log('La fecha actual es: ' +date);
+  console.log('La fecha del token es: '+tokenDate);
+  if (date > tokenDate) {
+    return false;
   }
-  return false;
+  return true;
 
 }
 
@@ -154,23 +160,17 @@ app.post('/Login', function (req, res, next) {
     else {
       console.log('---Obteniendo al usuario: ' + usuario.Username)
       console.log(usuario);
+      crearToken(usuario);//Tambien se va a crear un token cuando se logee
       Usuario.find({}).exec(function (err, usuarios) {
         if (err) {
           console.log('Ha ocurrido un error');
 
         }
         else {
-          console.log(usuarios);
+          //console.log(usuarios);
           res.status(200).render(__dirname + '/views/Chat.ejs', { user: usuario, data: usuarios });
         }
       });
-
-
-
-
-
-
-
     }
   });
   //Buscar en la base de datos
@@ -183,6 +183,19 @@ io.sockets.on('connection', function (socket) {
   sockets[socket.id] = socket;
 
   socket.on('send-message', function (data, callback) {
+    var token=localStorage.getItem('jwt');
+    console.log('El token actual es: '+token);
+    if(!validar( token) )
+    {
+      var dest='/Login';
+      io.emit('redirect',dest);
+      
+    }
+    else
+    {
+      console.log('adelante we...');
+    }
+
     console.log("sending a message...");
     io.emit('new-message', {
       nick: socket.nickname,
@@ -204,12 +217,18 @@ io.sockets.on('connection', function (socket) {
     }
   });
 
+  
   socket.on('disconnect', function (data) {
     console.log("Disconnected");
     if (!socket.nickname) return;
     delete users[socket.nickname];
     updateNickNames();
   });
+ 
+
+
+
+
 });
 
 app.get('/Chat', function (req, res) {

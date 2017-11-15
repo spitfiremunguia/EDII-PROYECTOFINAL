@@ -43,6 +43,9 @@ Message = function (arg) {
         console.log("Emisor: " + socket.nickname);
         
       });
+      socket.on('redirect',function(dest){
+        window.location.href = dest;
+      });
        socket.on('new-message', function(data){
          if(data.nick == socket.nickname)
           message_side = "left";
@@ -81,5 +84,8 @@ Message = function (arg) {
             html += "<li  ><a id='"+data[i]+"' class='contact'>" +data[i]+'</a></li>';
         }
         $('.available-users').html(html);
-    });      
+    });   
+    
+    
+  
   });
