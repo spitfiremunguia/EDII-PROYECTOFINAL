@@ -19,6 +19,7 @@ const storage = multer.diskStorage({
   }
 })
 var upload=multer({storage:storage});
+var md5=require('md5')
 
 
 //Conexión a mongo
@@ -59,12 +60,14 @@ app.listen(8000, function () {
 app.get('/create', function (req, res) {
   console.log("Creando usuario...");
   //Le mando la base de datos para verificar
-  res.render(__dirname + '/views/create.ejs',{db:db});
+  res.render(__dirname + '/views/create.ejs');
 });
 //verificar y crear al usuario
 app.post('/createUser',  upload.single('Imagen'),  function (req, res) {
  
-  req.body.Imagen=req.file.path==undefined?'/images/noUser.jpg':req.file.path;//Aqui se pueden comprimir supongo
+  console.log(req.file);
+  req.body.Imagen=(req.file==undefined)?'/images/noUser.jpg':req.file.path;//Aqui se pueden comprimir supongo
+  req.body.Contraseña=md5(req.body.Contraseña);//La contraseña se va a guardar en md5 en el servidor
   Usuario.create(req.body,function(err)
   {
     if(err){res.send(err);}
@@ -75,9 +78,20 @@ app.post('/createUser',  upload.single('Imagen'),  function (req, res) {
   });
 
 });
+//Login petition 
+app.get('/Login',function(req,res)
+{
+  console.log('Entrando al Login');
+  res.status(200).render(__dirname + '/views/Login.ejs');
+});
+//Login request
+app.post('/Login',function(req,res)
+{
+  var UserCorreo=req.body.UserCorreo;
+  var contraseña=md5(req.body.Contraseña);
+  //Buscar en la base de datos
 
-
-
+});
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   var err = new Error('Not Found');

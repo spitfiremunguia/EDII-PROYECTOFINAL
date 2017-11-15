@@ -1,0 +1,49 @@
+<head>
+    <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+</head>
+<script>$(function () {
+        $('.header').load('public/bars/userNavbar.html');
+    });</script>
+<div class="header"></div>
+
+<body class="loginBody">
+
+    <head>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ"
+            crossorigin="anonymous">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn"
+            crossorigin="anonymous"></script>
+    </head>
+    <form class="container" action="/Login" enctype="multipart/form-data" method="post">
+        <center>
+            <h1>Bienvenido</h1>
+        </center>
+        <hr>
+        <center>
+            <div class="form-group">
+                <div class="col-md-8">
+                    <label>Usuario o correo</label>
+                    <input id="USERCORREO" name="USERCORREO" type="text" placeholder="Correo o Usuario" class="form-control input-md" autocomplete=off
+                        required="">
+                </div>
+            </div>
+        </center>
+        <center>
+            <div class="form-group">
+                <div class="col-md-8">
+                    <label>Contraseña</label>
+                    <input id="Contraseña" name="Contraseña" type="text" placeholder="Contraseña" class="form-control input-md" autocomplete=off
+                        required="">
+                </div>
+            </div>
+        </center>
+        
+        <center>
+                <div>
+                        <input class="btn1" type="submit" value="Login">
+                </div>
+        </center>
+
+    </form>
+
+</body>

@@ -18,22 +18,24 @@
             crossorigin="anonymous"></script>
     </head>
     <form class="container" method="post" action="/createUser" enctype="multipart/form-data">
-        <br><br><legend class="col-md-8">
+        <br>
+        <br>
+        <legend class="col-md-8">
             <p>
                 <strong>Ingreso de datos</strong>
             </p>
         </legend>
         <div class="col-md-8">
             <div>
-                    <link  rel='stylesheet' href='public/stylesheets/style.css' />
-                       
-                    <input class="inputfile-2" type="file" name="Imagen" id="Imagen" accept= "image/x-png,image/gif,image/jpeg"    />
-                    <label  for="Imagen">Elija una imagen</label>
+                <link rel='stylesheet' href='public/stylesheets/style.css' />
+
+                <input class="inputfile-2" type="file" name="Imagen" id="Imagen" accept="image/x-png,image/gif,image/jpeg" />
+                <label for="Imagen">Elija una imagen</label>
             </div>
             <div>
-                <link  rel='stylesheet' href='public/stylesheets/style.css' />   
-                <img class="def" id='userimg' name=userimg src="/images/noUser.jpg" onerror="if (this.src != '/images/noUser.jpg') this.src = '/images/noUser.jpg';">
-               
+                <link rel='stylesheet' href='public/stylesheets/style.css' />
+                <img class="def" id='userimg' name=userimg src="/images/doggo.jpg" onerror="if (this.src != '/images/noUser.jpg') this.src = '/images/noUser.jpg';">
+
             </div>
 
             <script>
@@ -82,8 +84,8 @@
             <div class="col-md-8">
                 <input id="Username" name="Username" type="text" placeholder="" class="form-control input-md" autocomplete=off required="">
                 <script>
-                    $(document).ready(function(){
-                       
+                    $(document).ready(function () {
+
                     });
                 </script>
             </div>
@@ -106,10 +108,10 @@
             </div>
         </div>
         <div class="form-group">
-                <div class="col-md-8">
-                    <input class="btn" type="submit" value="Hecho">
-                </div>
+            <div class="col-md-8">
+                <input class="btn" type="submit" value="Hecho">
             </div>
+        </div>
 
     </form>
 
