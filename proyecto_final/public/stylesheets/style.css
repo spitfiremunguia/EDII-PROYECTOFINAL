@@ -90,6 +90,14 @@ body.loginBody
   background-attachment: fixed;
   background-position: center; 
 }
+body.userBody
+{
+  background-color:	rgb(236, 236, 235)  ;
+  background-image: url('/images/city.jpg');
+  background-repeat: repeat;
+  background-attachment: fixed;
+  background-position: center; 
+}
 form.create { 
   position:fixed;
   top:50%;
@@ -110,6 +118,115 @@ img.def
   border-color: yellow;
 
   
+}
+img.def1
+{
+  border-radius: 40%;
+  position: relative;;
+  height: 250px;
+  width: 250px;
+  display:inline-block;
+  margin-right:10px;
+  border-style: solid;
+  border: 5 rgb(15, 15, 15);
+  transform: translate(0%, 30%);
+
+  
+}
+ img.def1:hover {
+  cursor: pointer;
+}
+label.user
+{
+  font-size: 50px;
+  font-family: Impact, Charcoal, sans-serif;
+  color: rgb(7, 6, 6);
+  border-radius: 30%;
+  padding: 10px;
+  position: relative;
+  display:inline-block;
+  margin-right:10px;
+  border-style: solid;
+  border: 5 rgb(15, 15, 15);
+  transform: translate(35%, 100%);
+}
+div.display
+{
+  margin: 20px;
+ 
+ 
+}
+
+ 
+ul.display {
+  list-style-type: none;
+  width: 200px;
+  overflow: auto;
+  height: 600px;
+  transform: translate(0%, 10%);
+  border-radius: 5%
+  
+  
+  
+
+}
+ 
+h3.display {
+  font: bold 20px/2 Helvetica, Verdana, sans-serif ;
+  color: rgb(252, 250, 250);
+  right: 50%;
+  left: 10%;
+  
+}
+ 
+li.display img {
+  border-radius: 40%;
+  height: 100px;
+  width: 100px;
+  float: left;
+  margin: 0 40px 0 0;
+  
+}
+li.display img:hover {
+  -webkit-transform:scale(1.25); /* Safari and Chrome */
+  cursor: pointer;
+}
+ 
+li.display p {
+  font: 200 12px/3 Georgia, Times New Roman, serif white;
+  
+}
+ 
+li.display {
+  padding: 10px;
+  overflow: auto;
+}
+div.chat
+{
+  padding-left : 20px; float:left;
+}
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+label.user:hover
+{
+  font-family: Impact, Charcoal, sans-serif;
+  color: rgb(245, 21, 208);
 }
 /* style 2 */
 .inputfile-2 {
@@ -152,6 +269,10 @@ input.btn
   filter: url("#filter");
   transform: translate(180%, 30%);
 }
+
+input.btn:hover {
+  background-color: rgb(231, 255, 14); /* green */
+}
 input.btn1
 {
   display: inline-block;
@@ -173,10 +294,7 @@ input.btn1
   /*transform: translate(180%, 30%);*/
 }
   
-}
-input.btn:hover {
-  background-color: rgb(231, 255, 14); /* green */
-}
+
 input.btn1:hover {
   background-color: rgb(231, 255, 14); /* green */
 }

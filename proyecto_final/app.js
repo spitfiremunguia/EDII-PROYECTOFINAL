@@ -53,7 +53,7 @@ app.use('/images', express.static(path.join(__dirname, '/public/images')));
 app.use('/', index);
 app.use('/users', users);
 //Listen
-app.listen(8000, function () {
+app.listen(3000, function () {
   console.log('Server is up');
 });
 //Llamar a la función de crear usuarios
@@ -73,7 +73,7 @@ app.post('/createUser',  upload.single('Imagen'),  function (req, res) {
     if(err){res.send(err);}
     else{
       console.log('Usuario añadido exitosamente');
-      res.redirect('/');
+      res.status(201).redirect('/');
     }
   });
 
@@ -85,10 +85,42 @@ app.get('/Login',function(req,res)
   res.status(200).render(__dirname + '/views/Login.ejs');
 });
 //Login request
-app.post('/Login',function(req,res)
+app.post('/Login',function(req,res,next)
 {
-  var UserCorreo=req.body.UserCorreo;
+  var UserCorreo=req.body.Usuario;
   var contraseña=md5(req.body.Contraseña);
+  Usuario.findOne({Username:UserCorreo,Contraseña:contraseña}).exec(function(err,usuario){
+    if(err)
+    {
+
+      next(err);
+      console.log('Not found');
+      res.status(404);
+    }
+    else{
+      console.log('---Obteniendo al usuario: '+usuario.Username)
+      console.log(usuario);
+      Usuario.find({}).exec(function(err, usuarios){
+        if(err)
+        {
+          console.log('Ha ocurrido un error');
+        
+        }
+        else
+        {
+          console.log(usuarios);
+          res.status(200).render(__dirname + '/views/Chat.ejs',{user:usuario,data:usuarios});
+        }
+      });
+
+
+
+
+
+
+      
+    }
+  });
   //Buscar en la base de datos
 
 });
