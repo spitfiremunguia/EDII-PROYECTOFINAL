@@ -60,7 +60,7 @@
     background-color: #fdbf68;
   }
   .top_menu .buttons .button.maximize {
-    background-color: #a3d063;
+    background-color: #63d072;
   }
   .top_menu .title {
     text-align: center;
@@ -233,6 +233,12 @@ ol {
   transition: all .3s ease-out;   
 }
 
+.attach-button:hover{
+  background: #5aee7a;
+}
+.attach-button{
+  background: #64cf7a
+}
 .rounded-list a:hover{
   background: #eee;
 }

@@ -9,8 +9,7 @@ var UsuarioSchema = new Schema({
 	Username: String,
 	Correo: String,
     Contraseña: String,
-    Imagen:String
-	
+    Imagen:String	
 });
 
 

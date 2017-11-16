@@ -5,7 +5,7 @@
         
         
     </head>
-    <body>
+    <body background="images/chatbackground.jpg">
         <script src="http://code.jquery.com/jquery-latest.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script src="scripts/chatjquery.js"></script>
@@ -31,12 +31,16 @@
             <div class="message_input_wrapper">
                 <input class="message_input" id = "message_input" placeholder="Type your message here..." />
             </div>
-                      
+            
             <div class="send_message" id="send-message-button">
-                <div class="icon">
-                </div>
+                <div class="icon"></div>
                 <div class="text">Send</div>
-                </div>
+            </div>
+            <div>
+                <form ref="uploadform" id = "uploadform" action="/upload" method = "post" enctype="multipart/form-data">
+                    <input type="file" name="sampleFile"/>
+                    <input type="submit" id ="attachFile" value = "Upload!"/>                
+                </form>
             </div>
         </div>
         <div class="message_template">
