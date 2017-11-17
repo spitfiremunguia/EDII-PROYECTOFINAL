@@ -9,6 +9,7 @@
         <script src="http://code.jquery.com/jquery-latest.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script src="scripts/chatjquery.js"></script>
+        <script> src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
         
         <div class="chat_window">
         <div class="top_menu">
@@ -37,12 +38,13 @@
                 <div class="text">Send</div>
             </div>
             <div>
-                <form ref="uploadform" id = "uploadform"  enctype="multipart/form-data">
+                <form ref="uploadform" id = "uploadform"  action="/UploadFile" method="POST" enctype="multipart/form-data">
                     <input type="file" name="sampleFile", id="sampleFile"/>
                     <input type="submit" id ='attachFile' ,name='attachFile' value = "Upload!"/>  
                     <script>
                         $('#attachFile').click(function(e){
                             alert('Hola');
+                            return;
                         });
                     </script>              
                 </form>
