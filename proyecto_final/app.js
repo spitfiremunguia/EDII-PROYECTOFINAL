@@ -15,10 +15,11 @@ var multer = require('multer');
 var Chat = require('./routes/ChatModel')
 var formidable = require('formidable');
 var fileUpload = require("express-fileupload");
-var localStorage = require('localStorage');
-var moment = require('moment');
-var jwt = require('jwt-simple');
-var jwt_decode = require('jwt-decode');
+var localStorage = require('localStorage'); 
+var moment = require('moment'); 
+var jwt=require('jwt-simple'); 
+var jwt_decode=require('jwt-decode'); 
+var edge = require('edge');
 
 var onlineUsers = {};
 var sockets = {};
@@ -72,16 +73,6 @@ function validar(token) {
   return true;
 
 }
-
-
-
-
-
-
-
-
-
-var flash=require('express-flash-messages');
 var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io').listen(server);
@@ -115,6 +106,18 @@ app.get('/create', function (req, res) {
   //Le mando la base de datos para verificar
   res.render(__dirname + '/views/create.ejs');
 });
+
+var Cipher = edge.func({
+  assemblyFile: "lib/DLL Proyecto Final.dll",
+  typeName: "DLL_Proyecto_Final.RLE",
+  methodName: "CipherD"
+});
+var Decipher = edge.func({
+  assemblyFile: "lib/DLL Proyecto Final.dll",
+  typeName: "DLL_Proyecto_Final.RLE",
+  methodName: "DecipherD"
+});
+
 //verificar y crear al usuario
 app.post('/createUser', upload.single('Imagen'), function (req, res) {
   console.log(req.file);
@@ -204,14 +207,19 @@ io.sockets.on('connection', function (socket) {
     console.log('El token actual es: ' + token);
     if (!validar(token)) {
       var dest = '/Login';
-      io.emit('redirect', dest);
-    } else {
+      users[data.destinatario].emit('redirect', dest);
+    }else{
       console.log(data.destinatario);
-      if (data.destinatario) {
+      var cipheredMessage ="";
+      Cipher(data.message, function(error, result){
+        if(error) throw error;
+        cipheredMessage = result;
+      });
+      if(data.destinatario){
         var newMsg = new Chat({
           emisor: socket.nickname,
           receptor: data.destinatario,
-          msg: data.message
+          msg: cipheredMessage
         });
         newMsg.save(function (err) {
           if (err) console.log(err);
@@ -263,8 +271,16 @@ io.sockets.on('connection', function (socket) {
   socket.on('req-load-messages', function (data) {
     console.log("res-load-messages");
     var query = Chat.find({});
-    query.sort('-created').exec(function (err, docs) {
-      if (err) throw err;
+    query.sort('-created').exec(function(err, docs){
+      if(err) throw err;
+      for(var i = 0; i < docs.length; i++){
+        console.log(docs[i].msg);
+        if(docs[i].msg)
+        Decipher(docs[i].msg, function(error, result){
+          if(error) throw error;
+          docs[i].msg = result;
+        });
+      }
       socket.emit('res-load-messages', docs);
       console.log(docs);
     });

@@ -55,7 +55,7 @@ Message = function (arg) {
         $messageBox.val('');
         console.log("Emisor: " + socket.nickname);
         
-        
+
       });
     socket.on('new-message', function(data){        
         sendMessage("<b>"+data.nick+"</b>: " + data.msg, data.side);
@@ -114,7 +114,7 @@ Message = function (arg) {
                 sendMessage("<b>"+docs[i].emisor+"</b>: " + docs[i].msg, "right"); 
             else if(docs[i].receptor == $nickBox.val() && docs[i].emisor == localStorage.getItem("destinatario")){
                 sendMessage("<b>"+docs[i].emisor+"</b>: " + docs[i].msg, "left"); 
-            }   
+            }
         }
     });
 
