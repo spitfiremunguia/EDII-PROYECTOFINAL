@@ -1,3 +1,5 @@
+
+
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -6,17 +8,17 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var cons = require('consolidate');
 var mongoose = require('mongoose');
-var Usuario=require('./routes/Usuario')
+var Usuario = require('./routes/Usuario')
 var index = require('./routes/index');
 var users = require('./routes/users');
-var multer=require('multer');
+var multer = require('multer');
 var Chat = require('./routes/ChatModel')
 var formidable = require('formidable');
 var fileUpload = require("express-fileupload");
-var localStorage = require('localStorage'); 
-var moment = require('moment'); 
-var jwt=require('jwt-simple'); 
-var jwt_decode=require('jwt-decode'); 
+var localStorage = require('localStorage');
+var moment = require('moment');
+var jwt = require('jwt-simple');
+var jwt_decode = require('jwt-decode');
 
 var onlineUsers = {};
 var sockets = {};
@@ -29,19 +31,19 @@ const storage = multer.diskStorage({
     cb(null, file.originalname)
   }
 })
-var upload=multer({storage:storage});
-var md5=require('md5')
+var upload = multer({ storage: storage });
+var md5 = require('md5')
 
 
 //Conexión a mongo
 var db = "mongodb://localhost:27017/proyectoFinal/Users";//Por el momento esta local
-var db = mongoose.connect(db, function(err){
-	if(err){
-		console.log("Ocurrió un error al intentar conectar a la base de datos.");
+var db = mongoose.connect(db, function (err) {
+  if (err) {
+    console.log("Ocurrió un error al intentar conectar a la base de datos.");
     console.log("Intente montar la base de datos de manera local.");
-	}
+  }
 });
-var jwt_decode=require('jwt-decode');
+var jwt_decode = require('jwt-decode');
 function crearToken(usuario) {
   console.log(usuario);
   const payload =
@@ -49,7 +51,7 @@ function crearToken(usuario) {
       Username: usuario.Username,
       Contraseña: usuario.Contraseña,
       Ini: moment().unix(),
-      Exp: moment().add(10,'m').unix()
+      Exp: moment().add(10, 'm').unix()
     }
   var token = jwt.encode(payload, 'ESTRUCTURAS');
   console.log(token);
@@ -59,11 +61,11 @@ function crearToken(usuario) {
 
 function validar(token) {
   var validacion = JSON.stringify(jwt_decode(token));
-  console.log('El token decodificado  es: '+validacion);
+  console.log('El token decodificado  es: ' + validacion);
   var date = moment().unix();
-  var tokenDate=JSON.parse(validacion).Exp;
-  console.log('La fecha actual es: ' +date);
-  console.log('La fecha del token es: '+tokenDate);
+  var tokenDate = JSON.parse(validacion).Exp;
+  console.log('La fecha actual es: ' + date);
+  console.log('La fecha del token es: ' + tokenDate);
   if (date > tokenDate) {
     return false;
   }
@@ -113,63 +115,77 @@ app.get('/create', function (req, res) {
   res.render(__dirname + '/views/create.ejs');
 });
 //verificar y crear al usuario
-app.post('/createUser',  upload.single('Imagen'),  function (req, res) {
+app.post('/createUser', upload.single('Imagen'), function (req, res) {
   console.log(req.file);
-  req.body.Imagen=(req.file==undefined)?'/images/noUser.jpg':req.file.path;//Aqui se pueden comprimir supongo
-  req.body.Contraseña=md5(req.body.Contraseña);//La contraseña se va a guardar en md5 en el servidor
-  Usuario.count({Username: req.body.Username }, function(err, c){
-    if(c==0){
-      Usuario.create(req.body, function(err, c){
-        if(err) res.send(err);
-        else{
+  req.body.Imagen = (req.file == undefined) ? '/images/noUser.jpg' : req.file.path;//Aqui se pueden comprimir supongo
+  req.body.Contraseña = md5(req.body.Contraseña);//La contraseña se va a guardar en md5 en el servidor
+  Usuario.count({ Username: req.body.Username }, function (err, c) {
+    if (c == 0) {
+      Usuario.create(req.body, function (err, c) {
+        if (err) {
+          res.send(err);
+        }
+        else {
           console.log("Usuario añadido exitosamente");
-          Usuario.findOne({Username:req.body.Username, Contrasñea: req.body.Contraseña}).exec(function(err, usuario){
-            if(err){
+          Usuario.count({Username:req.body.Username},function(err,c){
+            console.log(c);
+          });
+          Usuario.findOne({ Username: req.body.Username ,Contraseña:req.body.Contraseña},function(err,usuario)
+          {
+            if (err) 
+            {
               res.status(500);
               console.log("ha ocurrido un error");
-            }else{
+            } 
+            else {
+              console.log(usuario);
               crearToken(usuario);
             }
-          });
+          }); 
+          //Aqui se llega a agregar de manera correcta
           res.status(201).redirect('/');
         }
       });
-    }else{
+    }
+    else {
+      req.session.error='El usuario ya existe';
+      res.redirect('/create');
+      res.render(__dirname + '/views/create.ejs',{erro:req.session.error});
       console.log("Usuario y aexiste");
+      res.redirect('/create');
     }
   });
 });
 //Login petition 
-app.get('/Login',function(req,res)
-{
+app.get('/Login', function (req, res) {
   console.log('Entrando al Login');
   res.status(200).render(__dirname + '/views/Login.ejs');
 });
 //Login request 
-app.post('/Login',function(req,res,next)
-{
-  var UserCorreo=req.body.Usuario;
-  var contraseña=md5(req.body.Contraseña);
-  Usuario.findOne({Username:UserCorreo,Contraseña:contraseña}).exec(function(err,usuario){
-    if(err)
-    {
+app.post('/Login', function (req, res, next) {
+  var UserCorreo = req.body.Usuario;
+  var contraseña = md5(req.body.Contraseña);
+  Usuario.findOne({ Username: UserCorreo, Contraseña: contraseña }).exec(function (err, usuario) {
+    if (err) {
 
       next(err);
       console.log('Not found');
-      res.status(404);
+
+      //alert('Usuario o contraseña incorrectos');
+      res.status(404).redirect('/Login', method('GET'));
     }
-    else{
-      console.log('---Obteniendo al usuario: '+usuario.Username)
+    else {
+      console.log('---Obteniendo al usuario: ' + usuario.Username)
       console.log(usuario);
       crearToken(usuario);//Tambien se va a crear un token cuando se logee
-      Usuario.find({}).exec(function(err, usuarios){
+      Usuario.find({}).exec(function (err, usuarios) {
         if (err) {
           console.log('Ha ocurrido un error');
-        
+
         }
         else {
           //console.log(usuarios);
-          res.status(200).render(__dirname + '/views/Chat.ejs',{user:usuario,data:usuarios});
+          res.status(200).render(__dirname + '/views/Chat.ejs', { user: usuario, data: usuarios });
         }
       });
     }
@@ -177,44 +193,44 @@ app.post('/Login',function(req,res,next)
   //Buscar en la base de datos
 
 });
-app.use(express.static(__dirname+ '/public'));
+app.use(express.static(__dirname + '/public'));
 
-io.sockets.on('connection', function(socket){
+io.sockets.on('connection', function (socket) {
   socket.nickname = socket
   sockets[socket.id] = socket;
-  socket.on('send-message', function(data, callback){
+  socket.on('send-message', function (data, callback) {
     console.log("Data: " + data);
     var token = localStorage.getItem('jwt');
     console.log('El token actual es: ' + token);
-    if(!validar(token)){
+    if (!validar(token)) {
       var dest = '/Login';
       io.emit('redirect', dest);
-    }else{
+    } else {
       console.log(data.destinatario);
-      if(data.destinatario){
+      if (data.destinatario) {
         var newMsg = new Chat({
           emisor: socket.nickname,
           receptor: data.destinatario,
           msg: data.message
         });
-        newMsg.save(function(err){
-          if(err) console.log(err);
-          else{
-            users[data.destinatario].emit('whisper',{
+        newMsg.save(function (err) {
+          if (err) console.log(err);
+          else {
+            users[data.destinatario].emit('whisper', {
               nick: socket.nickname,
               msg: data.message,
               side: "left"
-            });     
+            });
           }
         });
-        users[socket.nickname].emit('whisper',{
+        users[socket.nickname].emit('whisper', {
           nick: socket.nickname,
           msg: data.message,
           side: "right"
         });
-      }else{
+      } else {
         console.log("sending a message...");
-        io.emit('new-message',{
+        io.emit('new-message', {
           nick: socket.nickname,
           msg: data.message,
           side: "left"
@@ -222,14 +238,14 @@ io.sockets.on('connection', function(socket){
       }
     }
   });
-  function updateNickNames(){
+  function updateNickNames() {
     io.sockets.emit("usernames", Object.keys(users));
   }
-  socket.on('new-user', function(data, callback){
+  socket.on('new-user', function (data, callback) {
     console.log("newusermethod");
-    if(data in users){
+    if (data in users) {
       callback(false);
-    }else{
+    } else {
       callback(true);
       socket.nickname = data;
       users[socket.nickname] = socket;
@@ -237,27 +253,27 @@ io.sockets.on('connection', function(socket){
     }
   });
 
-  socket.on('disconnect', function(data){
+  socket.on('disconnect', function (data) {
     console.log("Disconnected");
-    if(!socket.nickname) return;
+    if (!socket.nickname) return;
     delete users[socket.nickname];
     updateNickNames();
   });
 
-  socket.on('req-load-messages', function(data){
+  socket.on('req-load-messages', function (data) {
     console.log("res-load-messages");
     var query = Chat.find({});
-    query.sort('-created').exec(function(err, docs){
-      if(err) throw err;
+    query.sort('-created').exec(function (err, docs) {
+      if (err) throw err;
       socket.emit('res-load-messages', docs);
       console.log(docs);
     });
   });
 });
 
-  
 
-app.get('/Chat', function(req, res){
+
+app.get('/Chat', function (req, res) {
   res.render('chat.ejs');
 });
 // catch 404 and forward to error handler
