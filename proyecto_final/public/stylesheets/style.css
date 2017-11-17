@@ -127,10 +127,18 @@ img.def
   position: relative;
   height: 250px;
   width: 250px;
-
+  -webkit-transition: -webkit-transform .8s ease-in-out;
+  transition:         transform .8s ease-in-out;
   border:20px;
   border-style: solid;
   border-color: rgb(7, 7, 6);
+
+  
+}
+img.def:hover
+{
+  -webkit-transform: rotate(360deg);
+  transform: rotate(360deg);
 
   
 }
@@ -144,12 +152,13 @@ img.def1
   margin-right:10px;
   border-style: solid;
   border: 5 rgb(15, 15, 15);
-  transform: translate(0%, 30%);
+  transform: translate(0%, 30%); 
 
   
 }
  img.def1:hover {
   cursor: pointer;
+  
 }
 input.btn12
 {
