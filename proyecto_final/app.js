@@ -127,6 +127,11 @@ var Decipher = edge.func({
 });
 var upload1=multer({storage:fileStorage});
 app.post('/UploadFile',upload1.single('myfile'),function(req,res){
+var Compress = edge.func({
+  assemblyFile: "lib/Compressor.dll",
+  typeName: "Compressor.Huffman",
+  methodName: "HuffmanCompression"
+});
 
 });
 //verificar y crear al usuario
@@ -226,6 +231,17 @@ app.post('/Login', function (req, res, next) {
 app.use(express.static(__dirname + '/public'));
 
 io.sockets.on('connection', function (socket) {
+  var payload ={
+    FilePath: "C:\\Users\\Maynor\\Documents\\Usuario.txt",
+    OutputPath: "C:\\Users\\Maynor\\Documents\\Visual Studio 2017"
+  }
+  Compress(payload, function(error, result){
+    if(error) console.log("error occured añsldkfjañlsdkjfañklsdfasdf");
+    else{
+      console.log("Compresse suffesfullyasdf");
+    }
+  });  
+
   socket.nickname = socket
   sockets[socket.id] = socket;
   socket.on('send-message', function (data, callback) {
