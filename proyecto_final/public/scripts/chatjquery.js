@@ -148,7 +148,7 @@ jQuery(function ($) {
     });
     socket.on('res-load-messages', function (docs) {
         console.log("retrieving...");
-        console.log("Emisor: " + $nickBoxnickBox.val());
+        console.log("Emisor: " + $nickBox.val());
         console.log("Receptor: " + localStorage.getItem("destinatario"));
         
         for (var i = docs.length - 1; i >= 0; i--) {

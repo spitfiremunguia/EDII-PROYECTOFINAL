@@ -8,7 +8,7 @@
   }
   
 .available-users{
-  width:auto;
+  width:25%;
   height:100%;
   text-align: left;
   margin-right: 30px;
@@ -21,10 +21,11 @@
 }
 
   .chat_window {
+    opacity: 0.95;
     position: absolute;
     width: calc(100% - 20px);
-    max-width: 800px;
-    height: 500px;
+    max-width: 90%;
+    height: 90%;
     border-radius: 10px;
     background-color: #fff;
     left: 50%;
@@ -33,6 +34,9 @@
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
     background-color: #f8f8f8;
     overflow: hidden;
+  }
+  .messages-container{
+    height: 100%;
   }
   .search_messages{
     border-radius: 10%;
@@ -86,7 +90,7 @@
     list-style: none;
     padding: 20px 10px 0 10px;
     margin: 0;
-    height: 347px;
+    height: 70%;
     overflow: scroll;
   }
   .messages .message {

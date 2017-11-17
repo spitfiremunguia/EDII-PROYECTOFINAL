@@ -166,7 +166,7 @@ app.post('/UploadFile',upload1.single('myfile'),function(req,res){
 
 
   var cipheredMessage = "";
-  Cipher("<a href='/download"+ req.file.filename+"'>"+req.file.filename+"</a>", function (error, result) {
+  Cipher("<a href='/download"+ req.file.filename+">"+req.file.filename+"'</a>", function (error, result) {
     if (error) throw error;
     cipheredMessage = result;
   });
@@ -175,7 +175,8 @@ app.post('/UploadFile',upload1.single('myfile'),function(req,res){
     receptor: req.body.destinatario,
     msg: cipheredMessage
   });  
-    users[req.body.emisor].emit('whisper', {
+  newMsg.save();
+  users[req.body.emisor].emit('whisper', {
     nick: req.body.emisor,
     msg: "<a href='/download"+ req.file.filename+"'>"+req.file.filename+"</a>",
     side: "right"
@@ -409,7 +410,7 @@ io.sockets.on('connection', function (socket) {
         Decipher(docs[i].msg, function(err, res){
          tmp = res;
         });
-        if(tmp.includes(data.query)){
+        if(tmp.toLowerCase().includes(data.query.toLowerCase())){
           if(docs[i].emisor == data.user || docs[i].receptor == data.user)
             Decipher(docs[i].msg, function(err, res){
               docs[i].msg = res.replaceAll(data.query, "<b>"+data.query+"</b>");
