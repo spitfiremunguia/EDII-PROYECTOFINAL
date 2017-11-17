@@ -15,10 +15,10 @@ var multer = require('multer');
 var Chat = require('./routes/ChatModel')
 var formidable = require('formidable');
 var fileUpload = require("express-fileupload");
-var localStorage = require('localStorage'); 
-var moment = require('moment'); 
-var jwt=require('jwt-simple'); 
-var jwt_decode=require('jwt-decode'); 
+var localStorage = require('localStorage');
+var moment = require('moment');
+var jwt = require('jwt-simple');
+var jwt_decode = require('jwt-decode');
 var edge = require('edge');
 
 var onlineUsers = {};
@@ -32,7 +32,16 @@ const storage = multer.diskStorage({
     cb(null, file.originalname)
   }
 })
+const fileStorage=multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './public/chatUploads/')
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname)
+  }
+});
 var upload = multer({ storage: storage });
+var upload1=multer({storage:fileStorage});
 var md5 = require('md5')
 
 
@@ -86,7 +95,6 @@ app.set('view engine', 'html');
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
-app.use(flash());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -98,7 +106,7 @@ app.use('/', index);
 app.use('/users', users);
 //Listen
 server.listen(8000, function () {
-  console.log('Server is up');
+  console.log("\x1b[42m", 'Server is up');
 });
 //Llamar a la función de crear usuarios
 app.get('/create', function (req, res) {
@@ -130,70 +138,86 @@ app.post('/createUser', upload.single('Imagen'), function (req, res) {
           res.send(err);
         }
         else {
-          console.log("Usuario añadido exitosamente");
-          Usuario.count({Username:req.body.Username},function(err,c){
+          console.log("\x1b[42m", "Usuario añadido exitosamente");
+          Usuario.count({ Username: req.body.Username }, function (err, c) {
             console.log(c);
           });
-          Usuario.findOne({ Username: req.body.Username ,Contraseña:req.body.Contraseña},function(err,usuario)
-          {
-            if (err) 
-            {
+          Usuario.findOne({ Username: req.body.Username, Contraseña: req.body.Contraseña }, function (err, usuario) {
+            if (err) {
               res.status(500);
               console.log("ha ocurrido un error");
-            } 
+            }
             else {
               console.log(usuario);
               crearToken(usuario);
             }
-          }); 
+          });
           //Aqui se llega a agregar de manera correcta
           res.status(201).redirect('/');
         }
       });
     }
     else {
-    
-      console.log("Usuario y aexiste");
-      req.flash('notify','Usuario ya existe');
-      res.redirect('/create');
+      console.log("\x1b[43m", "Usuario y existente");
+      res.redirect('/create');//Mandarlo de nuevo a que cree el usuario o algo asi
     }
   });
 });
 //Login petition 
 app.get('/Login', function (req, res) {
-  console.log('Entrando al Login');
+  console.log("\x1b[42m", 'Entrando al Login');
   res.status(200).render(__dirname + '/views/Login.ejs');
 });
 //Login request 
 app.post('/Login', function (req, res, next) {
   var UserCorreo = req.body.Usuario;
   var contraseña = md5(req.body.Contraseña);
-  Usuario.findOne({ Username: UserCorreo, Contraseña: contraseña }).exec(function (err, usuario) {
+  Usuario.count({ Username: UserCorreo, Contraseña: contraseña }, function (err, c) {
     if (err) {
-
-      next(err);
-      console.log('Not found');
-
-      //alert('Usuario o contraseña incorrectos');
-      res.status(404).redirect('/Login', method('GET'));
+      res.status(500);
+      console.log("\x1b[31m", 'Error en el Login');
     }
     else {
-      console.log('---Obteniendo al usuario: ' + usuario.Username)
-      console.log(usuario);
-      crearToken(usuario);//Tambien se va a crear un token cuando se logee
-      Usuario.find({}).exec(function (err, usuarios) {
-        if (err) {
-          console.log('Ha ocurrido un error');
+      if (c == 1) {
+        Usuario.findOne({ Username: UserCorreo, Contraseña: contraseña }).exec(function (err, usuario) {
+          if (err) {
 
-        }
-        else {
-          //console.log(usuarios);
-          res.status(200).render(__dirname + '/views/Chat.ejs', { user: usuario, data: usuarios });
-        }
-      });
+            next(err);
+            console.log('Not found');
+
+            //alert('Usuario o contraseña incorrectos');
+            res.status(404).redirect('/Login');
+          }
+          else {
+            console.log('---Obteniendo al usuario: ' + usuario.Username)
+            console.log(usuario);
+            crearToken(usuario);//Tambien se va a crear un token cuando se logee
+            Usuario.find({}).exec(function (err, usuarios) {
+              if (err) {
+                console.log("\x1b[31m", 'Ha ocurrido un error en la busqueda del usuario: ' + UserCorreo);
+
+              }
+              else {
+                //console.log(usuarios);
+                res.status(200).render(__dirname + '/views/Chat.ejs', { user: usuario, data: usuarios });
+              }
+            });
+          }
+        });
+      }
+      else {
+        console.log("\x1b[43m", 'Usuario o contraseña incorrectos');
+        res.redirect('/Login');
+      }
+
+
     }
   });
-  //Buscar en la base de datos
+
+  //Subir un archivo
+  app.post('/chatUpload', function (req, res) {
+
+  });
 
 });
 app.use(express.static(__dirname + '/public'));
@@ -208,14 +232,14 @@ io.sockets.on('connection', function (socket) {
     if (!validar(token)) {
       var dest = '/Login';
       users[data.destinatario].emit('redirect', dest);
-    }else{
+    } else {
       console.log(data.destinatario);
-      var cipheredMessage ="";
-      Cipher(data.message, function(error, result){
-        if(error) throw error;
+      var cipheredMessage = "";
+      Cipher(data.message, function (error, result) {
+        if (error) throw error;
         cipheredMessage = result;
       });
-      if(data.destinatario){
+      if (data.destinatario) {
         var newMsg = new Chat({
           emisor: socket.nickname,
           receptor: data.destinatario,
@@ -271,15 +295,15 @@ io.sockets.on('connection', function (socket) {
   socket.on('req-load-messages', function (data) {
     console.log("res-load-messages");
     var query = Chat.find({});
-    query.sort('-created').exec(function(err, docs){
-      if(err) throw err;
-      for(var i = 0; i < docs.length; i++){
+    query.sort('-created').exec(function (err, docs) {
+      if (err) throw err;
+      for (var i = 0; i < docs.length; i++) {
         console.log(docs[i].msg);
-        if(docs[i].msg)
-        Decipher(docs[i].msg, function(error, result){
-          if(error) throw error;
-          docs[i].msg = result;
-        });
+        if (docs[i].msg)
+          Decipher(docs[i].msg, function (error, result) {
+            if (error) throw error;
+            docs[i].msg = result;
+          });
       }
       socket.emit('res-load-messages', docs);
       console.log(docs);
