@@ -106,7 +106,7 @@ app.use('/', index);
 app.use('/users', users);
 //Listen
 server.listen(8000, function () {
-  console.log("\x1b[42m", 'Server is up');
+  console.log( "\x1b[0m",'Server is up');
 });
 //Llamar a la función de crear usuarios
 app.get('/create', function (req, res) {

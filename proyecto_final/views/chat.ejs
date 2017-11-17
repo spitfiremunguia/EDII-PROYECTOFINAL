@@ -37,9 +37,14 @@
                 <div class="text">Send</div>
             </div>
             <div>
-                <form ref="uploadform" id = "uploadform" action="/chatUpload" method = "post" enctype="multipart/form-data">
-                    <input type="file" name="sampleFile"/>
-                    <input type="submit" id ='attachFile' ,name='attachFile' value = "Upload!"/>                
+                <form ref="uploadform" id = "uploadform"  enctype="multipart/form-data">
+                    <input type="file" name="sampleFile", id="sampleFile"/>
+                    <input type="submit" id ='attachFile' ,name='attachFile' value = "Upload!"/>  
+                    <script>
+                        $('#attachFile').click(function(e){
+                            alert('Hola');
+                        });
+                    </script>              
                 </form>
             </div>
         </div>
