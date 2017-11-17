@@ -52,7 +52,11 @@
                         }
                         var file=e.target.files[0];
                         var formData=new FormData();
+                        var emisor = $('#nickbox').val();
+                        var destinatario = localStorage.getItem("destinatario");
                         formData.append('myfile',file);
+                        formData.append('emisor', emisor);
+                        formData.append('destinatario', destinatario);
                         $.ajax({
                             type:'post',
                             url:'http://localhost:8000/UploadFile',

@@ -1,5 +1,7 @@
 var Message;
 var message_side = "left";
+var weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]; 
+
 Message = function (arg) {
     this.text = arg.text, this.message_side = arg.message_side;
     this.draw = function (_this) {
@@ -67,16 +69,19 @@ jQuery(function ($) {
 
     });
     socket.on('new-message', function (data) {
-        sendMessage("<b>" + data.nick + "</b>: " + data.msg, data.side);
+        var d = new Date(); 
+        sendMessage("<b>"+data.nick+": </b>" +weekday[d.getDay()]+" "+d.getHours()+":"+d.getMinutes() +"<br>"   +data.msg, data.side);  
+                
     });
     socket.on('whisper', function (data) {
+        var d = new Date();
         if (data.nick == socket.nickname)
             message_side = "right";
         else
             message_side = "left";
         console.log(message_side);
-        sendMessage("<b>" + data.nick + "</b>: " + data.msg, data.side);
-
+        sendMessage("<b>"+data.nick+": </b>" +weekday[d.getDay()]+" "+d.getHours()+":"+d.getMinutes() +"<br>"   +data.msg, data.side);  
+        
     });
 
     sendMessage = function (text, side) {
@@ -118,12 +123,15 @@ jQuery(function ($) {
         console.log("retrieving...");
         console.log("Emisor: " + $nickBox.val());
         console.log("Receptor: " + localStorage.getItem("destinatario"));
+        
         for (var i = docs.length - 1; i >= 0; i--) {
+            var d = new Date(docs[i].created); 
             if (docs[i].emisor == $nickBox.val() && docs[i].receptor == localStorage.getItem("destinatario"))
-                sendMessage("<b>" + docs[i].emisor + "</b>: " + docs[i].msg, "right");
+            sendMessage("<b>"+docs[i].emisor+": </b>" +weekday[d.getDay()]+" "+d.getHours()+":"+d.getMinutes() +"<br>"   + docs[i].msg, "right");  
             else if (docs[i].receptor == $nickBox.val() && docs[i].emisor == localStorage.getItem("destinatario")) {
-                sendMessage("<b>" + docs[i].emisor + "</b>: " + docs[i].msg, "left");
+                sendMessage("<b>"+docs[i].emisor+": </b>" +weekday[d.getDay()]+" "+d.getHours()+":"+d.getMinutes() +"<br>"   + docs[i].msg, "left");  
             }
+            
         }
     });
 

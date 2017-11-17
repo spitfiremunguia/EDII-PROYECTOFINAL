@@ -41,7 +41,7 @@ const fileStorage=multer.diskStorage({
   }
 });
 var upload = multer({ storage: storage });
-
+var upload1=multer({storage:fileStorage});
 var md5 = require('md5')
 
 
@@ -125,17 +125,88 @@ var Decipher = edge.func({
   typeName: "DLL_Proyecto_Final.RLE",
   methodName: "DecipherD"
 });
-var upload1=multer({storage:fileStorage});
-app.post('/UploadFile',upload1.single('myfile'),function(req,res){
 var Compress = edge.func({
   assemblyFile: "lib/Compressor.dll",
   typeName: "Compressor.Huffman",
   methodName: "HuffmanCompression"
 });
+var Decompress = edge.func({
+  assemblyFile: "lib/Compressor.dll",
+  typeName: "Compressor.Huffman",
+  methodName: "HuffmanDecompression"
+});
+var Delete = edge.func({
+  assemblyFile: "lib/Compressor.dll",
+  typeName: "Compressor.Huffman",
+  methodName: "DeleteFile"
+});
 
+var upload1=multer({storage:fileStorage}); 
+
+
+var upload1=multer({storage:fileStorage}); 
+app.post('/UploadFile',upload1.single('myfile'),function(req,res){ 
+  console.log("Input: "+ __dirname+"\\"+req.file.path);
+  console.log("Output: " + __dirname+"\\public\\chatUploads");
+  var payload = {
+    FilePath: __dirname+"\\"+req.file.path,
+    OutputPath: __dirname+"\\public\\chatUploads"
+  }
+  Compress(payload, function(err, res){
+    if(err) console.log(errr);
+    else{
+      console.log(res);
+    }
+  });
+
+
+  var cipheredMessage = "";
+  Cipher("<a href='/download"+ req.file.filename+"'>"+req.file.filename+"</a>", function (error, result) {
+    if (error) throw error;
+    cipheredMessage = result;
+  });
+  var newMsg = new Chat({
+    emisor: req.body.emisor,
+    receptor: req.body.destinatario,
+    msg: cipheredMessage
+  });  
+    users[req.body.emisor].emit('whisper', {
+    nick: req.body.emisor,
+    msg: "<a href='/download"+ req.file.filename+"'>"+req.file.filename+"</a>",
+    side: "right"
+  });  
+  users[req.body.destinatario].emit('whisper', {
+    nick: req.body.emisor,
+    msg: "<a href='/download"+ req.file.filename+"'>"+req.file.filename+"</a>",
+    side: "left"
+  });
 });
 //verificar y crear al usuario
-app.get('/createUser', upload.single('Imagen'), function (req, res) {
+
+app.get('/download:id', function(req, res){
+  var a = req.params.id;
+  
+  var payload = {
+    FilePath: __dirname + "/public/chatUploads/" + a+".h.comp",
+    OutputPath: __dirname + "/public/chatUploads"  
+  }
+  console.log("FilePath: " + payload.FilePath);
+  console.log("OutputPath: " + payload.OutputPath);
+  Decompress(payload, function(err, res){
+    if(err) console.log(err);
+    else console.log(res);
+  });
+  var file = __dirname + "/public/chatUploads/" + req.params.id;
+  res.download(file, function(err){
+    if(err) throw err;
+    Delete((__dirname + "/public/chatUploads/" + req.params.id), function(err, res){
+      if(!err)
+        console.log("File was succesfully deleted");
+    });
+  });
+});
+
+app.post('/createUser', upload.single('Imagen'), function (req, res) {
   console.log(req.file);
   req.body.Imagen = (req.file == undefined) ? '/images/noUser.jpg' : req.file.path;//Aqui se pueden comprimir supongo
   req.body.Contraseña = md5(req.body.Contraseña);//La contraseña se va a guardar en md5 en el servidor
@@ -231,19 +302,14 @@ app.post('/Login', function (req, res, next) {
 app.use(express.static(__dirname + '/public'));
 
 io.sockets.on('connection', function (socket) {
-  var payload ={
-    FilePath: "C:\\Users\\Maynor\\Documents\\Usuario.txt",
-    OutputPath: "C:\\Users\\Maynor\\Documents\\Visual Studio 2017"
-  }
-  Compress(payload, function(error, result){
-    if(error) console.log("error occured añsldkfjañlsdkjfañklsdfasdf");
-    else{
-      console.log("Compresse suffesfullyasdf");
-    }
-  });  
+ 
+  
 
   socket.nickname = socket
   sockets[socket.id] = socket;
+
+
+  
   socket.on('send-message', function (data, callback) {
     console.log("Data: " + data);
     var token = localStorage.getItem('jwt');
