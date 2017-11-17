@@ -21,7 +21,18 @@ Message = function (arg) {
 
 jQuery(function ($) {
 
-
+    $queryBox = $("#query-box");
+    $queryBox.keyup(function (e) {
+        if (e.which === 13) {
+            var data = {
+                query: $queryBox.val(),
+                user: $nickBox.val()
+            }
+            socket.emit('query-request', data, function(data){
+                
+            });
+        }
+    });
 
     $(".available-users").on("click",
         function (e) {
@@ -56,14 +67,16 @@ jQuery(function ($) {
         socket.emit('send-message', { message: $fileSelector.val(), destinatario: localStorage.getItem("destinatario") }, function (data) {
             // Qué pasa si hay error? :S
         });
-        $messageBox.val('');
+        if(socket.nickname == $nickBox.val())
+            $messageBox.val('');
         console.log("Emisor: " + socket.nickname);
     });
     $sendButton.click(function (e) {
         socket.emit('send-message', { message: $messageBox.val(), destinatario: localStorage.getItem("destinatario") }, function (data) {
             // Qué pasa si hay error? :S
         });
-        $messageBox.val('');
+        if(socket.nickname == $nickBox.val())
+            $messageBox.val(''); 
         console.log("Emisor: " + socket.nickname);
 
 
@@ -119,9 +132,23 @@ jQuery(function ($) {
         window.location.href = dest;
     });
 
+    socket.on('query-response', function(docs){
+        $messages = $('.messages');
+        $messages.html('');
+        for(var i = docs.length-1; i>=0; i--){
+            
+            var d = new Date(docs[i].created);
+            if(docs[i].emisor == $nickBox.val()){
+                sendMessage("<b>"+docs[i].emisor+": </b>" +weekday[d.getDay()]+" "+d.getHours()+":"+d.getMinutes() +"<br>"   + docs[i].msg, "right");  
+            }else{
+                sendMessage("<b>"+docs[i].emisor+": </b>" +weekday[d.getDay()]+" "+d.getHours()+":"+d.getMinutes() +"<br>"   + docs[i].msg, "left");  
+                
+            }
+        }
+    });
     socket.on('res-load-messages', function (docs) {
         console.log("retrieving...");
-        console.log("Emisor: " + $nickBox.val());
+        console.log("Emisor: " + $nickBoxnickBox.val());
         console.log("Receptor: " + localStorage.getItem("destinatario"));
         
         for (var i = docs.length - 1; i >= 0; i--) {
@@ -130,8 +157,7 @@ jQuery(function ($) {
             sendMessage("<b>"+docs[i].emisor+": </b>" +weekday[d.getDay()]+" "+d.getHours()+":"+d.getMinutes() +"<br>"   + docs[i].msg, "right");  
             else if (docs[i].receptor == $nickBox.val() && docs[i].emisor == localStorage.getItem("destinatario")) {
                 sendMessage("<b>"+docs[i].emisor+": </b>" +weekday[d.getDay()]+" "+d.getHours()+":"+d.getMinutes() +"<br>"   + docs[i].msg, "left");  
-            }
-            
+            }            
         }
     });
 

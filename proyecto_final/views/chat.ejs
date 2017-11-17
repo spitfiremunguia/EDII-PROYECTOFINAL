@@ -18,15 +18,18 @@
                 <div class="button minimize"></div>
                 <div class="button maximize"></div>
                 <input disabled value = "<%-user.Username%>" id="nickbox"></input>
+                
             </div>
-            <div class="title">Chat</div>
+            <div class="title">Chat<div style="text-align: right;font-size: 15px; padding-left: 1em; padding-right: 1em;">Buscar mensaje&nbsp;
+                <input placeholder="Palabra clave.." class="search_messages"type="text" name="query" id="query-box"></div></div>
+            
         </div>
         <div class="available-users">
             <div class="title">Available Users</div>
         </div>
 
         <div class = "messages-container">
-            <ul class="messages"></ul>
+            <ul class="messages"><div class="title">Por favor seleccione una conversación</div></ul>
         </div>
         <div class="bottom_wrapper clearfix">
             <div class="message_input_wrapper">
@@ -42,7 +45,7 @@
                     <input type="file" name="sampleFile", id="sampleFile"/>
                     <input type="submit" id ='attachFile' ,name='attachFile' value = "Upload!"/>         
                 </form>
-                <script> src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+                <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
                 <script>
                     
                     $('#sampleFile').change(function(e){
@@ -59,7 +62,7 @@
                         formData.append('destinatario', destinatario);
                         $.ajax({
                             type:'post',
-                            url:'http://localhost:8000/UploadFile',
+                            url:'/UploadFile',
                             data:formData,
                             processData:false,
                             contentType:false,

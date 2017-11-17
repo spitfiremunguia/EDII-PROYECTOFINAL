@@ -24,6 +24,11 @@ var edge = require('edge');
 var onlineUsers = {};
 var sockets = {};
 
+String.prototype.replaceAll = function(search, replacement){
+  var target = this;
+  return target.replace(new RegExp(search, 'g'), replacement);
+}
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, './public/uploads/')
@@ -393,6 +398,32 @@ io.sockets.on('connection', function (socket) {
       socket.emit('res-load-messages', docs);
       console.log(docs);
     });
+  });
+  socket.on('query-request', function(data){
+    
+    console.log("Query: " + data.query);
+    var outputQuery=[];
+    var query=Chat.find({}).sort("-created").exec(function(err, docs){
+      for(var i = 0; i < docs.length; i++){
+        var tmp = "";
+        Decipher(docs[i].msg, function(err, res){
+         tmp = res;
+        });
+        if(tmp.includes(data.query)){
+          if(docs[i].emisor == data.user || docs[i].receptor == data.user)
+            Decipher(docs[i].msg, function(err, res){
+              docs[i].msg = res.replaceAll(data.query, "<b>"+data.query+"</b>");
+            });
+            outputQuery.push(docs[i]);         
+        }
+      }
+      console.log(outputQuery);
+      users[data.user].emit('query-response', outputQuery);
+    });
+    
+    
+
+    
   });
 });
 
