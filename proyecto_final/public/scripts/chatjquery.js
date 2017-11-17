@@ -34,7 +34,7 @@ jQuery(function ($) {
         }
     });
 
-    $(".available-users").on("click",
+    $(".users").on("click",
         function (e) {
             $messages = $('.messages');
             if ($(e.target).is(".contact")) {
@@ -119,13 +119,23 @@ jQuery(function ($) {
         }
     });
     socket.on('usernames', function (data) {
-        var html = "<div class='title'>Available Users</div>";
-        html += "<ol background='images/chatbackground.jpg' class='rounded-list'>";
-        for (var i = 6; i < data.length; i++) {
-            if (data[i] != $nickBox.val())
-                html += "<li  ><a id='" + data[i] + "' class='contact'>" + data[i] + '</a></li>';
+        var onlineHtml = "<div class='title'>Available Users</div>";
+        onlineHtml += "<ol background='images/chatbackground.jpg' class='rounded-list'>";
+        
+        for (var i = 0; i < data.online.length; i++) {
+            if (data.online[i] != $nickBox.val())
+            onlineHtml += "<li  ><a id='" + data.online[i] + "' class='contact'>" + data.online[i] + '</a></li>';
         }
-        $('.available-users').html(html);
+        $('#available-users').html(onlineHtml);
+
+        var offlineHtml = "<div class='title'>Offline Users</div>";
+        offlineHtml += "<ol background='images/chatbackground.jpg' class='rounded-list'>";
+        
+        for(var i = 0; i < data.offline.length; i++){
+            if(data.offline[i] != $nickBox.val())
+                offlineHtml += "<li  ><a id='" + data.offline[i] + "' class='contact'>" + data.offline[i] + '</a></li>';
+        }
+        $('#unavailable-users').html(offlineHtml);
     });
 
     socket.on('redirect', function (dest) {

@@ -166,26 +166,34 @@ app.post('/UploadFile',upload1.single('myfile'),function(req,res){
 
 
   var cipheredMessage = "";
-  Cipher("<a href='/download"+ req.file.filename+">"+req.file.filename+"'</a>", function (error, result) {
+  Cipher("<a href='/download"+ req.file.filename+"'>"+req.file.filename+"</a>", function (error, result) {
     if (error) throw error;
+    console.log(result);
     cipheredMessage = result;
   });
+
   var newMsg = new Chat({
     emisor: req.body.emisor,
     receptor: req.body.destinatario,
     msg: cipheredMessage
   });  
   newMsg.save();
-  users[req.body.emisor].emit('whisper', {
-    nick: req.body.emisor,
-    msg: "<a href='/download"+ req.file.filename+"'>"+req.file.filename+"</a>",
-    side: "right"
-  });  
-  users[req.body.destinatario].emit('whisper', {
-    nick: req.body.emisor,
-    msg: "<a href='/download"+ req.file.filename+"'>"+req.file.filename+"</a>",
-    side: "left"
-  });
+  if(users[req.body.emisor]){
+    users[req.body.emisor].emit('whisper', {
+      nick: req.body.emisor,
+      msg: "<a href='/download"+ req.file.filename+"'>"+req.file.filename+"</a>",
+      side: "right"
+    });    
+  }
+  
+  if(req.body.destinatario){
+    users[req.body.destinatario].emit('whisper', {
+      nick: req.body.emisor,
+      msg: "<a href='/download"+ req.file.filename+"'>"+req.file.filename+"</a>",
+      side: "left"
+    });  
+  }
+  
 });
 //verificar y crear al usuario
 
@@ -354,20 +362,25 @@ io.sockets.on('connection', function (socket) {
           msg: cipheredMessage
         });
         newMsg.save(function (err) {
-          if (err) console.log(err);
+        if (err) console.log(err);
           else {
-            users[data.destinatario].emit('whisper', {
-              nick: socket.nickname,
-              msg: data.message,
-              side: "left"
-            });
+            if(users[data.destinatario]){
+              users[data.destinatario].emit('whisper', {
+                nick: socket.nickname,
+                msg: data.message,
+                side: "left"
+              });
+            }            
           }
         });
-        users[socket.nickname].emit('whisper', {
-          nick: socket.nickname,
-          msg: data.message,
-          side: "right"
-        });
+        if(users[socket.nickname]){
+          users[socket.nickname].emit('whisper', {
+            nick: socket.nickname,
+            msg: data.message,
+            side: "right"
+          });
+        }
+        
       } else {
         console.log("sending a message...");
         io.emit('new-message', {
@@ -379,7 +392,26 @@ io.sockets.on('connection', function (socket) {
     }
   });
   function updateNickNames() {
-    io.sockets.emit("usernames", Object.keys(users));
+    var OnlineUsersNames = [];
+    var OfflineUserNames = [];
+    
+    var Query = Usuario.find({}).exec(function(err, docs){
+      console.log(docs);
+      for(var i = 0; i < docs.length; i++){
+        if(users[docs[i].Username]){
+          OnlineUsersNames.push(docs[i].Username);
+        }else{
+          OfflineUserNames.push(docs[i].Username);
+        }
+      }
+      var payload = {
+        online: OnlineUsersNames,
+        offline: OfflineUserNames
+      }
+      console.log("online: " + OnlineUsersNames);
+      console.log("offline" + OfflineUserNames);
+      io.sockets.emit("usernames", payload);
+    });
   }
   socket.on('new-user', function (data, callback) {
     console.log("newusermethod");
