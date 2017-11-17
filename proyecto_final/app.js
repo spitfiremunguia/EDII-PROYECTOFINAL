@@ -126,6 +126,9 @@ var Decipher = edge.func({
   methodName: "DecipherD"
 });
 
+app.post('/UploadFile',function(req,res){
+  console.log('LLega hasta aca subir imagenes o algo asi');
+});
 //verificar y crear al usuario
 app.post('/createUser', upload.single('Imagen'), function (req, res) {
   console.log(req.file);
