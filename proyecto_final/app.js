@@ -117,7 +117,7 @@ server.listen(8000, function () {
 app.get('/create', function (req, res) {
   console.log("Creando usuario...");
   //Le mando la base de datos para verificar
-  res.render(__dirname + '/views/create.ejs',{alert:false,msg:''});
+  res.render(__dirname + '/views/create.ejs',{db:Usuario});
 });
 
 var Cipher = edge.func({
@@ -249,6 +249,23 @@ app.post('/createUser', upload.single('Imagen'), function (req, res) {
   });
 });
 //Login petition 
+app.post('/checkForUser',function(req,res)
+{
+  var h=req.body;
+    console.log('chequeando usuario...'+h.user);
+    Usuario.count({Username:h.user},function(err,c){
+      if(c==0)//No deberia de encontrar nada
+      {
+        res.json({val:true});//significa que el usuario no existe
+      }
+      else{
+        res.json({val:false});//significa que si existe
+      }
+    });
+});
+
+
+
 app.get('/Login', function (req, res) {
   console.log("\x1b[42m", 'Entrando al Login');
   res.status(200).render(__dirname + '/views/Login.ejs');
