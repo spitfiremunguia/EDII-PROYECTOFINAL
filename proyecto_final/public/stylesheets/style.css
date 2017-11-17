@@ -74,13 +74,28 @@ div.bigtitle
   margin-right: -50%;
   transform: translate(-50%, -50%); 
 }
+h3.create
+{
+  text-align: center;
+  background:  gray;
+  font: 20px "Lucida Grande", Helvetica, Arial, sans-serif;
+  color: white;
+  border-radius: 20%;
+  height: 30px;
+  width: 200px;
+  transform: translate(-130%, 0%);
+ 
+  
+}
 body.createBody
 {
-  background-color:	rgb(243, 211, 32)  ;
-  background-image: url('/images/feather.png');
+  background-color:	rgb(77, 215, 236)  ;
+  background-image: url('/images/mt.png');
+  background-size: 800px 700px;
   background-repeat: no-repeat;
   background-attachment: fixed;
-  background-position: center; 
+  background-position: bottom  left; /*Positioning*/
+
 }
 body.loginBody
 {
@@ -109,13 +124,13 @@ img.def
 {
   border-radius: 40%;
   display: block;
-  position: relative;;
+  position: relative;
   height: 250px;
   width: 250px;
-  left: 35%;
-  margin-right: -50%;
-  border-style: double;
-  border-color: yellow;
+
+  border:20px;
+  border-style: solid;
+  border-color: rgb(7, 7, 6);
 
   
 }
@@ -135,6 +150,25 @@ img.def1
 }
  img.def1:hover {
   cursor: pointer;
+}
+input.btn12
+{
+  display: inline-block;
+  width: 150px;
+  padding: 60px 0 0 0;
+  height: 30px;
+  overflow: hidden;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  background: url('/images/edit.png') center center no-repeat #e4e4e4;
+  border-radius: 20px;
+  background-size: 30px 30px;
+  transform: translate(0%, 30%);
+}
+input.btn12:hover
+{
+background-color: #eb81d0;
 }
 label.user
 {
@@ -267,7 +301,7 @@ input.btn
   Transition: background-color 0.1s ease-out;
   -webkit-filter: url("#filter");
   filter: url("#filter");
-  transform: translate(180%, 30%);
+
 }
 
 input.btn:hover {

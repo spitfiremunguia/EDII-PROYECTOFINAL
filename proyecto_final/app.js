@@ -117,7 +117,7 @@ server.listen(8000, function () {
 app.get('/create', function (req, res) {
   console.log("Creando usuario...");
   //Le mando la base de datos para verificar
-  res.render(__dirname + '/views/create.ejs');
+  res.render(__dirname + '/views/create.ejs',{alert:false,msg:''});
 });
 
 var Cipher = edge.func({
@@ -243,7 +243,7 @@ app.post('/createUser', upload.single('Imagen'), function (req, res) {
     }
     else {
       console.log("\x1b[43m", "Usuario y existente");
-      res.redirect('/create');//Mandarlo de nuevo a que cree el usuario o algo asi
+      res.render(__dirname + '/views/create.ejs',{alert:true,msg:'El usuario ya existe!'});//Mandarlo de nuevo a que cree el usuario o algo asi
     }
   });
 });

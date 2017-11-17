@@ -273,3 +273,22 @@ ol {
   border-radius: 2em;
   transition: all .3s ease-out;
 }
+input.btn
+{
+  display: inline-block;
+  width: 60px;
+  padding: 60px 0 0 0;
+  height: 20px;
+  overflow: hidden;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  background: url('/images/send.png') center center no-repeat #e4e4e4;
+  border-radius: 20px;
+  background-size: 30px 30px;
+  transform: translate(0%, 20%);
+}
+input.btn:hover
+{
+background-color: #eb81d0;
+}

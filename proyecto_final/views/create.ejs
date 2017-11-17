@@ -1,6 +1,7 @@
 <head>
     <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
-
+    
+    
 </head>
 <link rel='bars' href='public/bars/userNavbar.html'>
 <script>$(function () {
@@ -16,101 +17,102 @@
             crossorigin="anonymous">
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn"
             crossorigin="anonymous"></script>
+           
+            
     </head>
-    <form class="container" method="post" action="/createUser" enctype="multipart/form-data">
-        <br>
-        <br>
-        <legend class="col-md-8">
-            <p>
-                <strong>Ingreso de datos</strong>
-            </p>
-        </legend>
-        <div class="col-md-8">
-            <div>
-                <link rel='stylesheet' href='public/stylesheets/style.css' />
-
-                <input class="inputfile-2" type="file" name="Imagen" id="Imagen" accept="image/x-png,image/gif,image/jpeg" />
-                <label for="Imagen">Elija una imagen</label>
-            </div>
-            <div>
-                <link rel='stylesheet' href='public/stylesheets/style.css' />
-                <img class="def" id='userimg' name=userimg src="/images/doggo.jpg" onerror="if (this.src != '/images/noUser.jpg') this.src = '/images/noUser.jpg';">
-
-            </div>
-
-            <script>
-                function readURL(input) {
-                    if (input.files && input.files[0]) {
-                        var reader = new FileReader();
-
-                        reader.onload = function (e) {
-                            $('#userimg').attr('src', e.target.result)
-                                .width(250)
-                                .height(250);
-                        }
-
-                        reader.readAsDataURL(input.files[0]);
-                    }
-                }
-
-                $("#Imagen").change(function () {
-                    readURL(this);
-                });
-            </script>
-        </div>
-
-
-
-        <div class="form-group">
-            <label class="col-md-4 control-label" for="key">
-                <strong>Nombre</strong>
-            </label>
+    <center>
+        <form class="container" method="post" action="/createUser" enctype="multipart/form-data">
+            <br>
+            <br>
+            <legend class="col-md-8">
+                <p>
+                    <strong>Ingreso de datos</strong>
+                </p>
+            </legend>
             <div class="col-md-8">
-                <input id="Nombre" name="Nombre" type="text" placeholder="" class="form-control input-md" autocomplete=off required="">
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-md-4 control-label" for="key">
-                <strong>Apellido</strong>
-            </label>
-            <div class="col-md-8">
-                <input id="Apeliido" name="Apellido" type="text" placeholder="" class="form-control input-md" autocomplete=off required="">
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-md-4 control-label" for="key">
-                <strong>Usuario</strong>
-            </label>
-            <div class="col-md-8">
-                <input id="Username" name="Username" type="text" placeholder="" class="form-control input-md" autocomplete=off required="">
+
+                <div>
+
+                    <br>
+                    <link rel='stylesheet' href='public/stylesheets/style.css' />
+                    <img class="def" id='userimg' name=userimg src="/images/noUser.jpg'" onerror="if (this.src != '/images/noUser.jpg') this.src = '/images/noUser.jpg';">
+
+                </div>
+                <div>
+                    <link rel='stylesheet' href='public/stylesheets/style.css' />
+
+                    <input class="btn12" type="file" name="Imagen" id="Imagen" accept="image/x-png,image/gif,image/jpeg" />
+
+                </div>
+
                 <script>
-                
+                    function readURL(input) {
+                        if (input.files && input.files[0]) {
+                            var reader = new FileReader();
+
+                            reader.onload = function (e) {
+                                $('#userimg').attr('src', e.target.result)
+                                    .width(250)
+                                    .height(250);
+                            }
+
+                            reader.readAsDataURL(input.files[0]);
+                        }
+                    }
+
+                    $("#Imagen").change(function () {
+                        readURL(this);
+                    });
                 </script>
             </div>
-        </div>
+            <br>
+            <br>
+            <br>
+            <div class="form-group">
+                    <h3 class="create">Nombre </h3>
+                <div class="col-md-8">
+                    <input id="Nombre" name="Nombre" type="text" placeholder="" class="form-control input-md" autocomplete=off required="">
+                </div>
+            </div>
+            <div class="form-group">
+                    <h3 class="create">Apellido </h3>
+                <div class="col-md-8">
+                    <input id="Apeliido" name="Apellido" type="text" placeholder="" class="form-control input-md" autocomplete=off required="">
+                </div>
+            </div>
+            <div class="form-group">
+                    <h3 class="create">Usuario </h3>
+                <div class="col-md-8">
+                    <input id="Username" name="Username" type="text" placeholder='<%!JSON.stringify(msg)%>'  class="form-control input-md" autocomplete=off required="">
+                    <script>
 
-        <div class="form-group">
-            <label class="col-md-4 control-label" for="key">
-                <strong>Correo</strong>
-            </label>
-            <div class="col-md-8">
-                <input id="Correo" name="Correo" type="email" placeholder="" class="form-control input-md" autocomplete=off required="">
+                    </script>
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            <label class="col-md-4 control-label" for="key">
-                <strong>Contraseña</strong>
-            </label>
-            <div class="col-md-8">
-                <input id="Contraseña" name="Contraseña" type="password" placeholder="" class="form-control input-md" autocomplete=off required="">
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="col-md-8">
-                <input class="btn" type="submit" value="Hecho">
-            </div>
-        </div>
 
-    </form>
+            <div class="form-group">
+                    <h3 class="create">Correo </h3>
+                <div class="col-md-8">
+                    <input id="Correo" name="Correo" type="email" placeholder="" class="form-control input-md" autocomplete=off required="">
+                </div>
+            </div>
+            <div class="form-group">
+               
+                    <h3 class="create">Contraseña </h3>
+                <div class="col-md-8">
+                    <input id="Contraseña" name="Contraseña" type="password" placeholder="" class="form-control input-md" autocomplete=off required="">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-8">
+                    <center>
+                        <input class="btn" type="submit" value="Hecho">
+                    </center>
+                </div>
+            </div>
+
+        </form>
+    </center>
+    
 
 </body>
