@@ -41,7 +41,7 @@ const fileStorage=multer.diskStorage({
   }
 });
 var upload = multer({ storage: storage });
-var upload1=multer({storage:fileStorage});
+
 var md5 = require('md5')
 
 
@@ -125,12 +125,12 @@ var Decipher = edge.func({
   typeName: "DLL_Proyecto_Final.RLE",
   methodName: "DecipherD"
 });
+var upload1=multer({storage:fileStorage});
+app.post('/UploadFile',upload1.single('myfile'),function(req,res){
 
-app.post('/UploadFile',function(req,res){
-  console.log('LLega hasta aca subir imagenes o algo asi');
 });
 //verificar y crear al usuario
-app.post('/createUser', upload.single('Imagen'), function (req, res) {
+app.get('/createUser', upload.single('Imagen'), function (req, res) {
   console.log(req.file);
   req.body.Imagen = (req.file == undefined) ? '/images/noUser.jpg' : req.file.path;//Aqui se pueden comprimir supongo
   req.body.Contraseña = md5(req.body.Contraseña);//La contraseña se va a guardar en md5 en el servidor
