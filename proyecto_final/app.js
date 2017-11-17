@@ -148,9 +148,7 @@ app.post('/createUser', upload.single('Imagen'), function (req, res) {
       });
     }
     else {
-      req.session.error='El usuario ya existe';
-      res.redirect('/create');
-      res.render(__dirname + '/views/create.ejs',{erro:req.session.error});
+    
       console.log("Usuario y aexiste");
       res.redirect('/create');
     }
