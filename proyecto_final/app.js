@@ -66,7 +66,7 @@ function crearToken(usuario) {
       Username: usuario.Username,
       Contraseña: usuario.Contraseña,
       Ini: moment().unix(),
-      Exp: moment().add(1, 'm').unix()
+      Exp: moment().add(20, 'm').unix()
     }
   var token = jwt.encode(payload, 'ESTRUCTURAS');
   console.log(token);
