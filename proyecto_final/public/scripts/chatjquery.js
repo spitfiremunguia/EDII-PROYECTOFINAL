@@ -68,7 +68,6 @@ jQuery(function ($) {
             // Qué pasa si hay error? :S
         });
         if(socket.nickname == $nickBox.val())
-            $messageBox.val('');
         console.log("Emisor: " + socket.nickname);
     });
     $sendButton.click(function (e) {
@@ -76,7 +75,6 @@ jQuery(function ($) {
             // Qué pasa si hay error? :S
         });
         if(socket.nickname == $nickBox.val())
-            $messageBox.val(''); 
         console.log("Emisor: " + socket.nickname);
 
 
@@ -84,7 +82,9 @@ jQuery(function ($) {
     socket.on('new-message', function (data) {
         var d = new Date(); 
         sendMessage("<b>"+data.nick+": </b>" +weekday[d.getDay()]+" "+d.getHours()+":"+d.getMinutes() +"<br>"   +data.msg, data.side);  
-                
+        if(data.nick == $nickBox.val()){
+            $messageBox.val('');
+        }       
     });
     socket.on('whisper', function (data) {
         var d = new Date();
@@ -92,13 +92,16 @@ jQuery(function ($) {
             message_side = "right";
         else
             message_side = "left";
+
+        if(data.nick == $nickBox.val()){
+            $messageBox.val('');
+        } 
         console.log(message_side);
         sendMessage("<b>"+data.nick+": </b>" +weekday[d.getDay()]+" "+d.getHours()+":"+d.getMinutes() +"<br>"   +data.msg, data.side);  
         
     });
 
     sendMessage = function (text, side) {
-        $messageBox.val('');
         var $messages, message;
         if (text.trim() === '') {
             return;
@@ -111,7 +114,7 @@ jQuery(function ($) {
             message_side: message_side
         });
         message.draw();
-        return $messages.animate({ scrollTop: $messages.prop('scrollHeight') }, 300);
+        return $messages.animate({ scrollTop: $messages.prop('scrollHeight') }, 20);
     };
     $messageBox.keyup(function (e) {
         if (e.which === 13) {

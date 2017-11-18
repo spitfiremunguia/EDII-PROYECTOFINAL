@@ -66,7 +66,7 @@ function crearToken(usuario) {
       Username: usuario.Username,
       Contraseña: usuario.Contraseña,
       Ini: moment().unix(),
-      Exp: moment().add(10, 'm').unix()
+      Exp: moment().add(1, 'm').unix()
     }
   var token = jwt.encode(payload, 'ESTRUCTURAS');
   console.log(token);
@@ -347,7 +347,8 @@ io.sockets.on('connection', function (socket) {
     console.log('El token actual es: ' + token);
     if (!validar(token)) {
       var dest = '/Login';
-      users[data.destinatario].emit('redirect', dest);
+      
+      users[socket.nickname].emit('redirect', dest);
     } else {
       console.log(data.destinatario);
       var cipheredMessage = "";
